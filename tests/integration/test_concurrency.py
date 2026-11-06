@@ -14,11 +14,13 @@ def test_concurrent_withdrawals_allow_only_one_success(
     seeded_account,
 ) -> None:
     user, account = seeded_account
+    account_id = account.id
+    user_id = user.id
 
     def withdraw(amount: str, key: str) -> str:
         with Session(postgres_engine) as session:
-            locked_account = session.scalar(select(Account).where(Account.id == account.id))
-            actor = session.get(User, user.id)
+            locked_account = session.scalar(select(Account).where(Account.id == account_id))
+            actor = session.get(User, user_id)
             try:
                 post_withdrawal(session, actor, locked_account, Decimal(amount), key)
             except HTTPException as exc:
@@ -35,14 +37,14 @@ def test_concurrent_withdrawals_allow_only_one_success(
 
     assert sorted(results) == ["posted", "rejected:422"]
     with Session(postgres_engine) as session:
-        refreshed = session.get(Account, account.id)
+        refreshed = session.get(Account, account_id)
         assert refreshed.available_balance in {
             Decimal("300.0000"),
             Decimal("400.0000"),
         }
         assert (
             session.scalar(
-                select(FinancialTransaction.id).where(FinancialTransaction.actor_id == user.id)
+                select(FinancialTransaction.id).where(FinancialTransaction.actor_id == user_id)
             )
             is not None
         )
