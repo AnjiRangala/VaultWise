@@ -3,6 +3,7 @@ from fastapi.testclient import TestClient
 from app.auth import create_access_token, hash_password, verify_password
 from app.config import Settings
 from app.main import app
+from app.routers import account_router
 
 client = TestClient(app)
 
@@ -38,7 +39,7 @@ def test_money_movement_requires_authentication_before_processing() -> None:
 
 
 def test_required_balance_route_is_registered() -> None:
-    routes = {route.path for route in app.routes if hasattr(route, "path")}
+    routes = {route.path for route in account_router.routes}
     assert "/accounts/{account_id}/balance" in routes
 
 
@@ -71,7 +72,10 @@ def test_password_hash_is_not_reversible_and_verifies() -> None:
 
 def test_production_settings_reject_development_jwt_secret() -> None:
     try:
-        Settings(app_env="production")
+        Settings(
+            app_env="production",
+            jwt_secret_key="replace-this-development-secret-key",
+        )
     except ValueError as exc:
         assert "JWT_SECRET_KEY" in str(exc)
     else:
