@@ -132,7 +132,7 @@ def _post(
         return replay
     if record.status == "failed" and record.response_body is not None:
         raise HTTPException(
-            status_code=record.response_status or status.HTTP_422_UNPROCESSABLE_ENTITY,
+            status_code=record.response_status or status.HTTP_422_UNPROCESSABLE_CONTENT,
             detail=json.loads(record.response_body)["error"],
         )
     accounts = [account for account in (source, destination) if account is not None]
@@ -147,7 +147,7 @@ def _post(
         failure = {"error": "Insufficient funds"}
         record.status = "failed"
         record.response_body = json.dumps(failure)
-        record.response_status = status.HTTP_422_UNPROCESSABLE_ENTITY
+        record.response_status = status.HTTP_422_UNPROCESSABLE_CONTENT
         record.completed_at = datetime.now(UTC)
         db.add(
             AuditEvent(
