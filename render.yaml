@@ -14,7 +14,6 @@ services:
     dockerfilePath: ./Dockerfile
     dockerContext: .
     healthCheckPath: /health/ready
-    preDeployCommand: alembic upgrade head
     envVars:
       - key: APP_ENV
         value: production

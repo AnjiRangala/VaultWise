@@ -266,9 +266,11 @@ Managed PostgreSQL → FastAPI Web Service → React Static Site
 The repository includes a Render Blueprint in `render.yaml`. Create a
 Blueprint from this repository and review the resources before applying it.
 It uses a free static site, a free Docker web service, and free PostgreSQL.
-Alembic migrations run before API deploys; readiness checks PostgreSQL. Render
-generates the JWT signing key and wires the database URL, API URL, and CORS
-origin between services without committing secrets.
+The API container runs `alembic upgrade head` before starting Uvicorn; if a
+migration fails, the API does not start. Its readiness check also verifies
+PostgreSQL connectivity. Render generates the JWT signing key and wires the
+database URL, API URL, and CORS origin between services without committing
+secrets.
 
 **Free Render resources are for hobby/testing use, not production financial
 data.** The API sleeps after 15 minutes without traffic and can take about a
@@ -288,9 +290,10 @@ across projects. To use it, create a Neon PostgreSQL database, set the API
 service's `DATABASE_URL` in Render to Neon's connection string (keep it secret;
 the application adapts standard PostgreSQL URLs to psycopg 3), and remove or
 omit the Render Postgres resource and its `fromDatabase` variable from the
-Blueprint. Keep the existing Alembic migration command and readiness check.
-Neon is still a free-tier service with quotas; arrange independent backups and
-verify its current terms before storing important data.
+Blueprint. The container startup migration and readiness check work with this
+PostgreSQL option as well. Neon is still a free-tier service with quotas;
+arrange independent backups and verify its current terms before storing
+important data.
 
 For either database choice, verify `/health` and `/health/ready` after deploy.
 Do not treat any free-tier setup as a production banking or financial ledger
