@@ -263,21 +263,38 @@ The API container runs as a non-root user. For a hosted deployment, use:
 Managed PostgreSQL → FastAPI Web Service → React Static Site
 ```
 
-The repository includes a Render Blueprint in `render.yaml`. In Render, create
-a Blueprint from this repository and review its resources before applying it.
-It provisions a managed PostgreSQL database, a Docker-based API service, and a
-static frontend. The API's release command applies Alembic migrations before
-deployment; the service readiness check verifies database connectivity.
-Render generates the JWT signing key and wires the database URL, frontend API
-URL, and CORS origin between services without committing secrets.
+The repository includes a Render Blueprint in `render.yaml`. Create a
+Blueprint from this repository and review the resources before applying it.
+It uses a free static site, a free Docker web service, and free PostgreSQL.
+Alembic migrations run before API deploys; readiness checks PostgreSQL. Render
+generates the JWT signing key and wires the database URL, API URL, and CORS
+origin between services without committing secrets.
 
-The Blueprint uses Render's paid Starter API and Basic PostgreSQL plans; review
-current pricing and choose another plan if needed before applying. For a manual
-deployment, configure the backend with production `DATABASE_URL`,
-`APP_ENV=production`, a unique `JWT_SECRET_KEY` of at least 32 characters, and
-the frontend host in `CORS_ORIGINS`. Configure the frontend with
-`VITE_API_URL` set to the API host or its HTTPS URL. Verify `/health` and
-`/health/ready` after deployment.
+**Free Render resources are for hobby/testing use, not production financial
+data.** The API sleeps after 15 minutes without traffic and can take about a
+minute to wake. Free web services share a 750-hour monthly allowance per
+workspace and can be suspended when usage allowances are exhausted. The free
+PostgreSQL database is limited to 1 GB, has no backups, and expires 30 days
+after creation. After a further 14-day grace period Render deletes the database
+and all its data. Do not store real balances or other irreplaceable data there.
+These limits are documented in [Render's free-instance
+policy](https://render.com/docs/free) and [static site
+docs](https://render.com/docs/static-sites).
+
+For a longer-lived $0 PostgreSQL option, [Neon's Free
+plan](https://neon.com/pricing) is permanent and does not require a credit
+card. It currently allows up to 100 projects, 1 GB per project, and 20 GB
+across projects. To use it, create a Neon PostgreSQL database, set the API
+service's `DATABASE_URL` in Render to Neon's connection string (keep it secret;
+the application adapts standard PostgreSQL URLs to psycopg 3), and remove or
+omit the Render Postgres resource and its `fromDatabase` variable from the
+Blueprint. Keep the existing Alembic migration command and readiness check.
+Neon is still a free-tier service with quotas; arrange independent backups and
+verify its current terms before storing important data.
+
+For either database choice, verify `/health` and `/health/ready` after deploy.
+Do not treat any free-tier setup as a production banking or financial ledger
+service.
 
 The current UI and API provide account-holder registration, authentication,
 accounts, money movement, statements, and read-only admin/auditor API routes.
