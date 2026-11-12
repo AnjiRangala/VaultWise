@@ -15,9 +15,9 @@ from app.models import (
 
 @pytest.fixture(scope="session")
 def postgres_engine() -> Iterator[Engine]:
-    url = os.getenv("LEDGERLINE_TEST_DATABASE_URL")
+    url = os.getenv("BALANCE_VAULT_TEST_DATABASE_URL")
     if not url:
-        pytest.skip("Set LEDGERLINE_TEST_DATABASE_URL to run PostgreSQL integration tests")
+        pytest.skip("Set BALANCE_VAULT_TEST_DATABASE_URL to run PostgreSQL integration tests")
 
     engine = create_engine(url, pool_pre_ping=True)
     try:

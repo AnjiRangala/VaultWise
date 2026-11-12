@@ -1,8 +1,8 @@
-# LedgerLine — Secure Money Movement System
+# Balance Vault — Secure Money Movement System
 
 ## 1. Project introduction
 
-LedgerLine is a secure financial application for reliable money movement. It
+Balance Vault is a secure financial application for reliable money movement. It
 provides deposits, withdrawals, transfers, balances, and statements while
 protecting financial integrity with JWT authentication, Argon2id password
 hashing, role-based authorization, idempotency, deterministic row locking,
@@ -31,7 +31,7 @@ Browser
 ### Repository layout
 
 ```text
-LedgerLine/
+BalanceVault/
 ├── app/                 # FastAPI backend application
 ├── frontend/            # React + TypeScript dashboard
 ├── tests/               # Unit and PostgreSQL integration tests
@@ -69,7 +69,7 @@ Prerequisites:
 Create and activate a backend environment:
 
 ```powershell
-cd "C:\path\to\LedgerLine"
+cd "C:\path\to\BalanceVault"
 python -m venv .venv
 .\.venv\Scripts\Activate.ps1
 python -m pip install -e ".[dev]"
@@ -94,19 +94,22 @@ Copy-Item .env.example .env
 Development configuration:
 
 ```env
-APP_NAME=LedgerLine
+APP_NAME=Balance Vault
 APP_ENV=development
-DATABASE_URL=postgresql+psycopg://ledgerline:ledgerline_dev@localhost:5432/ledgerline
-JWT_SECRET_KEY=replace-this-development-secret-key
+DATABASE_URL=postgresql+psycopg://ledgerline:replace-with-a-unique-local-password@localhost:5432/ledgerline
+POSTGRES_PASSWORD=replace-with-the-same-url-safe-local-password
+JWT_SECRET_KEY=replace-with-a-unique-local-secret-of-at-least-32-characters
 JWT_ALGORITHM=HS256
 ACCESS_TOKEN_EXPIRE_MINUTES=15
 ```
 
-For production, generate a secret of at least 32 characters:
+Replace the placeholders before starting the application. Use a unique local
+database password and signing key; do not reuse production credentials. The
+Compose API container derives its internal database URL from
+`POSTGRES_PASSWORD`, while a locally run API uses `DATABASE_URL`.
 
-```powershell
-python -c "import secrets; print(secrets.token_urlsafe(48))"
-```
+For production, configure `DATABASE_URL` and a unique `JWT_SECRET_KEY` of at
+least 32 characters through the deployment platform's secret manager.
 
 Never commit `.env`, production secrets, or database credentials.
 
@@ -158,7 +161,7 @@ Protected endpoints require the JWT returned by `POST /auth/login`.
 ### Register and login
 
 ```powershell
-$body = '{"email":"demo@example.com","password":"DemoPassword123!"}'
+$body = '{"email":"demo@example.com","password":"<choose-a-password-of-at-least-12-characters>"}'
 Invoke-RestMethod http://127.0.0.1:8000/auth/register -Method Post `
   -ContentType "application/json" -Body $body
 
@@ -233,7 +236,7 @@ For a local demo, create an Account Holder through the dashboard or
 
 ```text
 Email: demo@example.com
-Password: DemoPassword123!
+Password: <choose-a-password-of-at-least-12-characters>
 Role: account_holder
 ```
 
@@ -293,8 +296,8 @@ cd ..
 Run PostgreSQL integration tests:
 
 ```powershell
-$env:LEDGERLINE_TEST_DATABASE_URL = `
-  "postgresql+psycopg://ledgerline:ledgerline_dev@localhost:5432/ledgerline"
+$env:BALANCE_VAULT_TEST_DATABASE_URL = `
+  $env:DATABASE_URL
 pytest tests/integration -q
 ```
 

@@ -6,6 +6,7 @@ from app.main import app
 from app.routers import account_router
 
 client = TestClient(app)
+TEST_PASSWORD = "test-only-password-for-hash-check"
 
 
 def test_health_endpoint() -> None:
@@ -62,11 +63,10 @@ def test_token_accepts_database_string_role() -> None:
 
 
 def test_password_hash_is_not_reversible_and_verifies() -> None:
-    password = "correct horse battery staple"
-    hashed = hash_password(password)
+    hashed = hash_password(TEST_PASSWORD)
 
-    assert hashed != password
-    assert verify_password(password, hashed)
+    assert hashed != TEST_PASSWORD
+    assert verify_password(TEST_PASSWORD, hashed)
     assert not verify_password("wrong password", hashed)
 
 
@@ -74,7 +74,8 @@ def test_production_settings_reject_development_jwt_secret() -> None:
     try:
         Settings(
             app_env="production",
-            jwt_secret_key="replace-this-development-secret-key",
+            database_url="sqlite://",
+            jwt_secret_key="<generate-a-unique-local-secret>",
         )
     except ValueError as exc:
         assert "JWT_SECRET_KEY" in str(exc)

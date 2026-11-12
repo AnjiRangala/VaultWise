@@ -1,4 +1,4 @@
-# LedgerLine API
+# Balance Vault API
 
 All protected endpoints use:
 

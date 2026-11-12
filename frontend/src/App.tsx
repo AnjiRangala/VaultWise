@@ -9,12 +9,22 @@ import { Account, api, StatementEntry, Transaction, User } from "./api";
 type AuthMode = "login" | "register";
 type Action = "deposit" | "withdraw" | "transfer" | null;
 
+const TOKEN_KEY = "balance_vault_token";
+const LEGACY_TOKEN_KEY = "ledgerline_token";
+
+function getStoredToken() {
+  const token = localStorage.getItem(TOKEN_KEY) ?? localStorage.getItem(LEGACY_TOKEN_KEY);
+  if (token) localStorage.setItem(TOKEN_KEY, token);
+  localStorage.removeItem(LEGACY_TOKEN_KEY);
+  return token;
+}
+
 function money(value: string | number, currency = "INR") {
   return new Intl.NumberFormat("en-IN", { style: "currency", currency }).format(Number(value));
 }
 
 function App() {
-  const [token, setToken] = useState(localStorage.getItem("ledgerline_token"));
+  const [token, setToken] = useState(getStoredToken);
   const [user, setUser] = useState<User | null>(null);
   const [accounts, setAccounts] = useState<Account[]>([]);
   const [transactions, setTransactions] = useState<Transaction[]>([]);
@@ -40,7 +50,7 @@ function App() {
   useEffect(() => {
     if (!token) return;
     refresh(token).catch((cause: Error) => {
-      localStorage.removeItem("ledgerline_token");
+      localStorage.removeItem(TOKEN_KEY);
       setToken(null);
       setError(cause.message);
     }).finally(() => setLoading(false));
@@ -57,13 +67,13 @@ function App() {
   };
 
   const signOut = () => {
-    localStorage.removeItem("ledgerline_token");
+    localStorage.removeItem(TOKEN_KEY);
     setToken(null);
     setUser(null);
   };
 
   if (!token) return <AuthScreen mode="login" onAuthenticated={(value) => {
-    localStorage.setItem("ledgerline_token", value);
+    localStorage.setItem(TOKEN_KEY, value);
     setToken(value);
   }} />;
   if (loading || !user) return <div className="loading-screen"><Sparkles /> Loading your secure workspace...</div>;
@@ -71,7 +81,7 @@ function App() {
   return (
     <div className="app-shell">
       <aside className="sidebar">
-        <div className="brand"><div className="brand-mark"><CircleDollarSign size={23} /></div><span>Ledger<span>Line</span></span></div>
+        <div className="brand"><div className="brand-mark"><CircleDollarSign size={23} /></div><span>Balance Vault</span></div>
         <div className="side-label">Workspace</div>
         <button className="nav-item active"><Wallet size={18} /> Overview</button>
         <button className="nav-item" onClick={() => document.getElementById("accounts")?.scrollIntoView()}><CreditCard size={18} /> Accounts</button>
@@ -118,7 +128,7 @@ function AuthScreen({ mode: initialMode, onAuthenticated }: { mode: AuthMode; on
     try { if (mode === "register") await api.register(email, password); const result = await api.login(email, password); onAuthenticated(result.access_token); }
     catch (cause) { setError(cause instanceof Error ? cause.message : "Unable to continue"); }
   };
-  return <div className="auth-page"><div className="auth-decoration"><div className="brand light"><div className="brand-mark"><CircleDollarSign size={23} /></div><span>Ledger<span>Line</span></span></div><div className="auth-quote"><h2>Money movement,<br /><em>made trustworthy.</em></h2><p>One secure workspace for every balance, transfer, and financial decision.</p><div className="trust-line"><ShieldCheck size={18} /> Double-entry accounting · Immutable audit trails</div></div></div><div className="auth-card"><div className="mobile-brand"><div className="brand"><div className="brand-mark"><CircleDollarSign size={23} /></div><span>Ledger<span>Line</span></span></div></div><p className="eyebrow">SECURE FINANCE PLATFORM</p><h1>{mode === "login" ? "Welcome back" : "Create your account"}</h1><p className="form-subtitle">{mode === "login" ? "Sign in to your secure financial workspace." : "Start moving money with confidence."}</p>{error && <div className="alert error">{error}</div>}<form onSubmit={submit}><label>Email address<input type="email" required value={email} onChange={(e) => setEmail(e.target.value)} placeholder="you@example.com" /></label><label>Password<input type="password" required minLength={mode === "register" ? 12 : 1} value={password} onChange={(e) => setPassword(e.target.value)} placeholder="••••••••••••" /></label><button className="primary-button" type="submit">{mode === "login" ? "Sign in securely" : "Create account"} <ChevronRight size={17} /></button></form><p className="switch-auth">{mode === "login" ? "New to LedgerLine?" : "Already have an account?"} <button onClick={() => { setMode(mode === "login" ? "register" : "login"); setError(""); }}>{mode === "login" ? "Create an account" : "Sign in"}</button></p></div></div>;
+  return <div className="auth-page"><div className="auth-decoration"><div className="brand light"><div className="brand-mark"><CircleDollarSign size={23} /></div><span>Balance Vault</span></div><div className="auth-quote"><h2>Money movement,<br /><em>made trustworthy.</em></h2><p>One secure workspace for every balance, transfer, and financial decision.</p><div className="trust-line"><ShieldCheck size={18} /> Double-entry accounting · Immutable audit trails</div></div></div><div className="auth-card"><div className="mobile-brand"><div className="brand"><div className="brand-mark"><CircleDollarSign size={23} /></div><span>Balance Vault</span></div></div><p className="eyebrow">SECURE FINANCE PLATFORM</p><h1>{mode === "login" ? "Welcome back" : "Create your account"}</h1><p className="form-subtitle">{mode === "login" ? "Sign in to your secure financial workspace." : "Start moving money with confidence."}</p>{error && <div className="alert error">{error}</div>}<form onSubmit={submit}><label>Email address<input type="email" required value={email} onChange={(e) => setEmail(e.target.value)} placeholder="you@example.com" /></label><label>Password<input type="password" required minLength={mode === "register" ? 12 : 1} value={password} onChange={(e) => setPassword(e.target.value)} placeholder="••••••••••••" /></label><button className="primary-button" type="submit">{mode === "login" ? "Sign in securely" : "Create account"} <ChevronRight size={17} /></button></form><p className="switch-auth">{mode === "login" ? "New to Balance Vault?" : "Already have an account?"} <button onClick={() => { setMode(mode === "login" ? "register" : "login"); setError(""); }}>{mode === "login" ? "Create an account" : "Sign in"}</button></p></div></div>;
 }
 
 function MovementModal({ action, accounts, token, onClose, onComplete }: { action: Exclude<Action, null>; accounts: Account[]; token: string; onClose: () => void; onComplete: () => Promise<void> }) {

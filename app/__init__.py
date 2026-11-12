@@ -1,1 +1,1 @@
-"""LedgerLine application package."""
+"""Balance Vault application package."""

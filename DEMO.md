@@ -1,4 +1,4 @@
-# LedgerLine five-minute demo
+# Balance Vault five-minute demo
 
 This demo is intended for a local development environment only. It must not be
 run against real money or production users.
