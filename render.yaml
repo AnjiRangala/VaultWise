@@ -1,3 +1,5 @@
+# Keep Blueprint Auto Sync disabled until the existing web services are
+# renamed in the Render Dashboard. Then manually sync this Blueprint.
 databases:
   - name: balance-vault-db
     databaseName: balance_vault
@@ -7,7 +9,7 @@ databases:
 
 services:
   - type: web
-    name: balance-vault-api
+    name: vaultwise-api
     runtime: docker
     plan: free
     region: oregon
@@ -26,13 +28,13 @@ services:
       - key: JWT_SECRET_KEY
         generateValue: true
       - key: CORS_ORIGINS
-        value: https://balance-vault-frontend.onrender.com
+        value: https://vaultwise-frontend.onrender.com
 
   - type: web
-    name: balance-vault-frontend
+    name: vaultwise-frontend
     runtime: static
     buildCommand: cd frontend && npm ci && npm run build
     staticPublishPath: ./frontend/dist
     envVars:
       - key: VITE_API_URL
-        value: https://balance-vault-api.onrender.com
+        value: https://vaultwise-api.onrender.com

@@ -272,15 +272,39 @@ The API container runs `alembic upgrade head` before starting Uvicorn; if a
 migration fails, the API does not start. Its readiness check also verifies
 PostgreSQL connectivity. Render generates the JWT signing key, supplies the
 production frontend/API origins explicitly, and connects the database without
-committing secrets. Existing Render resource names (`balance-vault-frontend`,
-`balance-vault-api`, and `balance-vault-db`), database name, and hostnames stay
-unchanged to avoid provisioning replacement resources and risking production
-data. Set the API's `APP_NAME` to `VaultWise`. For these deployed services, set
-frontend
-`VITE_API_URL=https://balance-vault-api.onrender.com` and backend
-`CORS_ORIGINS=https://balance-vault-frontend.onrender.com`. If either Render
-service already exists, sync the Blueprint and redeploy the frontend so Vite
-rebuilds with the API URL; restart/redeploy the backend to load its CORS origin.
+committing secrets. The Blueprint names the existing web services `vaultwise-frontend`
+and `vaultwise-api`, and points them at `https://vaultwise-frontend.onrender.com`
+and `https://vaultwise-api.onrender.com`. The existing PostgreSQL resource
+(`balance-vault-db`), database name, and connection reference are deliberately
+unchanged. Never remove or recreate that database to rename the web services.
+
+**Safely rename existing Render services without creating replacements:**
+
+1. In the existing Blueprint's **Settings**, keep **Auto Sync** set to **No**.
+   The Blueprint defaults to auto-sync; pushing new service names before
+   renaming the existing resources can create duplicate web services.
+2. Open the existing `balance-vault-api` service, go to **Settings → General**,
+   and change its name to `vaultwise-api`. Rename the existing
+   `balance-vault-frontend` Static Site to `vaultwise-frontend` in the same
+   way. Rename these services in place; do not use **New Web Service** or
+   **New Static Site**.
+3. Confirm Render shows the new service URLs. Set the API environment variable
+   `CORS_ORIGINS=https://vaultwise-frontend.onrender.com` and the Static Site
+   build environment variable
+   `VITE_API_URL=https://vaultwise-api.onrender.com`. Keep `DATABASE_URL`,
+   `JWT_SECRET_KEY`, `APP_ENV`, and the PostgreSQL database untouched. Save the
+   API settings and let it restart; redeploy the Static Site so Vite rebuilds
+   with the new API URL.
+4. Only after both existing services have the new names and URLs, open the
+   existing Blueprint and choose **Manual Sync**. Review the proposed changes:
+   it must update the two existing web services and must not propose creating a
+   database or duplicate services. Cancel if Render proposes a new database or
+   extra web services.
+5. Verify the frontend, `https://vaultwise-api.onrender.com/health`, and
+   `/health/ready`; then test login/registration and authenticated API calls.
+
+Render's free service hostnames change with their service names; the old
+`balance-vault-*.onrender.com` links should not be assumed to remain aliases.
 
 **Free Render resources are for hobby/testing use, not production financial
 data.** The API sleeps after 15 minutes without traffic and can take about a
