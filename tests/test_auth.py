@@ -81,3 +81,25 @@ def test_production_settings_reject_development_jwt_secret() -> None:
         assert "JWT_SECRET_KEY" in str(exc)
     else:
         raise AssertionError("Production settings accepted the development JWT secret")
+
+
+def test_postgres_connection_string_uses_installed_psycopg_driver() -> None:
+    settings = Settings(
+        database_url="postgresql://user:password@db.example.com:5432/balance_vault",
+        jwt_secret_key="test-only-signing-key-not-for-deployment-use",
+    )
+
+    assert settings.database_url.startswith("postgresql+psycopg://")
+
+
+def test_cors_hosts_without_scheme_default_to_https() -> None:
+    settings = Settings(
+        database_url="sqlite://",
+        jwt_secret_key="test-only-signing-key-not-for-deployment-use",
+        cors_origins="frontend.example.com, http://localhost:5173/",
+    )
+
+    assert settings.cors_origin_list == [
+        "https://frontend.example.com",
+        "http://localhost:5173",
+    ]

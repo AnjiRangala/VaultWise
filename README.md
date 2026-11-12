@@ -110,6 +110,8 @@ Compose API container derives its internal database URL from
 
 For production, configure `DATABASE_URL` and a unique `JWT_SECRET_KEY` of at
 least 32 characters through the deployment platform's secret manager.
+Standard `postgresql://` and `postgres://` URLs are adapted to the installed
+psycopg 3 driver automatically.
 
 Never commit `.env`, production secrets, or database credentials.
 
@@ -255,18 +257,33 @@ docker compose up -d api
 docker compose ps
 ```
 
-The API container runs as a non-root user and expects migrations to be applied
-explicitly. For a hosted deployment, use:
+The API container runs as a non-root user. For a hosted deployment, use:
 
 ```text
 Managed PostgreSQL → FastAPI Web Service → React Static Site
 ```
 
-Configure the backend with production `DATABASE_URL`, `APP_ENV=production`,
-and a strong `JWT_SECRET_KEY`. Configure the frontend with
-`VITE_API_URL=https://<your-api-host>`. Add the deployed frontend origin to
-the backend CORS allow-list before serving the site publicly. Verify `/health`
-and `/health/ready` after deployment.
+The repository includes a Render Blueprint in `render.yaml`. In Render, create
+a Blueprint from this repository and review its resources before applying it.
+It provisions a managed PostgreSQL database, a Docker-based API service, and a
+static frontend. The API's release command applies Alembic migrations before
+deployment; the service readiness check verifies database connectivity.
+Render generates the JWT signing key and wires the database URL, frontend API
+URL, and CORS origin between services without committing secrets.
+
+The Blueprint uses Render's paid Starter API and Basic PostgreSQL plans; review
+current pricing and choose another plan if needed before applying. For a manual
+deployment, configure the backend with production `DATABASE_URL`,
+`APP_ENV=production`, a unique `JWT_SECRET_KEY` of at least 32 characters, and
+the frontend host in `CORS_ORIGINS`. Configure the frontend with
+`VITE_API_URL` set to the API host or its HTTPS URL. Verify `/health` and
+`/health/ready` after deployment.
+
+The current UI and API provide account-holder registration, authentication,
+accounts, money movement, statements, and read-only admin/auditor API routes.
+There is no admin UI, approval workflow, or public administrator provisioning
+flow in this repository; these require product requirements and are not
+created by the deployment configuration.
 
 ## 9. Testing instructions
 

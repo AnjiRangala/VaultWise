@@ -1,4 +1,7 @@
-const API_URL = import.meta.env.VITE_API_URL ?? `http://${window.location.hostname}:8000`;
+const configuredApiUrl = import.meta.env.VITE_API_URL?.trim();
+const API_URL = configuredApiUrl
+  ? `${/^https?:\/\//i.test(configuredApiUrl) ? "" : "https://"}${configuredApiUrl}`.replace(/\/+$/, "")
+  : `http://${window.location.hostname}:8000`;
 
 export type User = {
   id: string;

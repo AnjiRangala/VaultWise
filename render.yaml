@@ -1,0 +1,43 @@
+databases:
+  - name: balance-vault-db
+    databaseName: balance_vault
+    user: balance_vault
+    plan: basic-256mb
+    region: oregon
+
+services:
+  - type: web
+    name: balance-vault-api
+    runtime: docker
+    plan: starter
+    region: oregon
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    healthCheckPath: /health/ready
+    preDeployCommand: alembic upgrade head
+    envVars:
+      - key: APP_ENV
+        value: production
+      - key: DATABASE_URL
+        fromDatabase:
+          name: balance-vault-db
+          property: connectionString
+      - key: JWT_SECRET_KEY
+        generateValue: true
+      - key: CORS_ORIGINS
+        fromService:
+          type: web
+          name: balance-vault-frontend
+          property: host
+
+  - type: web
+    name: balance-vault-frontend
+    runtime: static
+    buildCommand: cd frontend && npm ci && npm run build
+    staticPublishPath: ./frontend/dist
+    envVars:
+      - key: VITE_API_URL
+        fromService:
+          type: web
+          name: balance-vault-api
+          property: host
