@@ -24,10 +24,7 @@ services:
       - key: JWT_SECRET_KEY
         generateValue: true
       - key: CORS_ORIGINS
-        fromService:
-          type: web
-          name: balance-vault-frontend
-          property: host
+        value: https://balance-vault-frontend.onrender.com
 
   - type: web
     name: balance-vault-frontend
@@ -36,7 +33,4 @@ services:
     staticPublishPath: ./frontend/dist
     envVars:
       - key: VITE_API_URL
-        fromService:
-          type: web
-          name: balance-vault-api
-          property: host
+        value: https://balance-vault-api.onrender.com

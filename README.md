@@ -268,9 +268,13 @@ Blueprint from this repository and review the resources before applying it.
 It uses a free static site, a free Docker web service, and free PostgreSQL.
 The API container runs `alembic upgrade head` before starting Uvicorn; if a
 migration fails, the API does not start. Its readiness check also verifies
-PostgreSQL connectivity. Render generates the JWT signing key and wires the
-database URL, API URL, and CORS origin between services without committing
-secrets.
+PostgreSQL connectivity. Render generates the JWT signing key, supplies the
+production frontend/API origins explicitly, and connects the database without
+committing secrets. For these deployed services, set frontend
+`VITE_API_URL=https://balance-vault-api.onrender.com` and backend
+`CORS_ORIGINS=https://balance-vault-frontend.onrender.com`. If either Render
+service already exists, sync the Blueprint and redeploy the frontend so Vite
+rebuilds with the API URL; restart/redeploy the backend to load its CORS origin.
 
 **Free Render resources are for hobby/testing use, not production financial
 data.** The API sleeps after 15 minutes without traffic and can take about a

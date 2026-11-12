@@ -103,3 +103,13 @@ def test_cors_hosts_without_scheme_default_to_https() -> None:
         "https://frontend.example.com",
         "http://localhost:5173",
     ]
+
+
+def test_production_frontend_origin_is_accepted_by_cors_configuration() -> None:
+    settings = Settings(
+        database_url="sqlite://",
+        jwt_secret_key="test-only-signing-key-not-for-deployment-use",
+        cors_origins="https://balance-vault-frontend.onrender.com",
+    )
+
+    assert "https://balance-vault-frontend.onrender.com" in settings.cors_origin_list
