@@ -1,8 +1,8 @@
-# Balance Vault — Secure Money Movement System
+# VaultWise — Secure Money Movement
 
 ## 1. Project introduction
 
-Balance Vault is a secure financial application for reliable money movement. It
+VaultWise is a secure financial application for reliable money movement. It
 provides deposits, withdrawals, transfers, balances, and statements while
 protecting financial integrity with JWT authentication, Argon2id password
 hashing, role-based authorization, idempotency, deterministic row locking,
@@ -31,7 +31,7 @@ Browser
 ### Repository layout
 
 ```text
-BalanceVault/
+VaultWise/
 ├── app/                 # FastAPI backend application
 ├── frontend/            # React + TypeScript dashboard
 ├── tests/               # Unit and PostgreSQL integration tests
@@ -69,7 +69,7 @@ Prerequisites:
 Create and activate a backend environment:
 
 ```powershell
-cd "C:\path\to\BalanceVault"
+cd "C:\path\to\VaultWise"
 python -m venv .venv
 .\.venv\Scripts\Activate.ps1
 python -m pip install -e ".[dev]"
@@ -94,7 +94,7 @@ Copy-Item .env.example .env
 Development configuration:
 
 ```env
-APP_NAME=Balance Vault
+APP_NAME=VaultWise
 APP_ENV=development
 DATABASE_URL=postgresql+psycopg://ledgerline:replace-with-a-unique-local-password@localhost:5432/ledgerline
 POSTGRES_PASSWORD=replace-with-the-same-url-safe-local-password
@@ -106,7 +106,9 @@ ACCESS_TOKEN_EXPIRE_MINUTES=15
 Replace the placeholders before starting the application. Use a unique local
 database password and signing key; do not reuse production credentials. The
 Compose API container derives its internal database URL from
-`POSTGRES_PASSWORD`, while a locally run API uses `DATABASE_URL`.
+`POSTGRES_PASSWORD`, while a locally run API uses `DATABASE_URL`. Compose keeps
+its existing `ledgerline` database, user, and volume identifiers to preserve
+existing local database data.
 
 For production, configure `DATABASE_URL` and a unique `JWT_SECRET_KEY` of at
 least 32 characters through the deployment platform's secret manager.
@@ -270,7 +272,11 @@ The API container runs `alembic upgrade head` before starting Uvicorn; if a
 migration fails, the API does not start. Its readiness check also verifies
 PostgreSQL connectivity. Render generates the JWT signing key, supplies the
 production frontend/API origins explicitly, and connects the database without
-committing secrets. For these deployed services, set frontend
+committing secrets. Existing Render resource names (`balance-vault-frontend`,
+`balance-vault-api`, and `balance-vault-db`), database name, and hostnames stay
+unchanged to avoid provisioning replacement resources and risking production
+data. Set the API's `APP_NAME` to `VaultWise`. For these deployed services, set
+frontend
 `VITE_API_URL=https://balance-vault-api.onrender.com` and backend
 `CORS_ORIGINS=https://balance-vault-frontend.onrender.com`. If either Render
 service already exists, sync the Blueprint and redeploy the frontend so Vite
@@ -337,7 +343,7 @@ cd ..
 Run PostgreSQL integration tests:
 
 ```powershell
-$env:BALANCE_VAULT_TEST_DATABASE_URL = `
+$env:VAULTWISE_TEST_DATABASE_URL = `
   $env:DATABASE_URL
 pytest tests/integration -q
 ```

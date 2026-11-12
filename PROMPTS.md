@@ -1,9 +1,9 @@
 # AI Engineering Log
 
-This log records actual AI-assisted work performed on Balance Vault (formerly
-LedgerLine). The workspace
-was not a Git repository during these entries, so commit links are explicitly
-recorded as unavailable rather than fabricated.
+This log records the project's AI-assisted engineering history. The
+application is now branded VaultWise; earlier work used its previous product
+names. The workspace was not a Git repository during these entries, so commit
+links are explicitly recorded as unavailable rather than fabricated.
 
 ## 2026-11-06 — Initial repository assessment
 
@@ -84,7 +84,7 @@ recorded as unavailable rather than fabricated.
   idempotency tests, negative-balance checks, audit immutability checks, and
   rollback checks.
 - **Verification:** The tests collect and skip with explicit reasons when
-  `BALANCE_VAULT_TEST_DATABASE_URL` is unavailable. The local unit suite reports
+  `VAULTWISE_TEST_DATABASE_URL` is unavailable. The local unit suite reports
   10 passing tests; PostgreSQL execution is configured in CI.
 - **Change:** Added integration test files and CI PostgreSQL execution.
 - **Commit:** Unavailable; the directory was not a Git repository.

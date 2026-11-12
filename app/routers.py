@@ -88,7 +88,7 @@ def create_account(
 ) -> Account:
     account = Account(
         owner_user_id=user.id,
-        account_number=f"LL-{uuid4().hex[:20].upper()}",
+        account_number=f"VW-{uuid4().hex[:20].upper()}",
         currency=payload.currency,
         status=AccountStatus.ACTIVE,
     )

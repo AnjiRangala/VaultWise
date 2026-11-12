@@ -1,1 +1,1 @@
-"""Balance Vault test package."""
+"""VaultWise test package."""

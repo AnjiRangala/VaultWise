@@ -5,13 +5,20 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class Settings(BaseSettings):
-    app_name: str = "Balance Vault"
+    app_name: str = "VaultWise"
     app_env: str = "development"
     database_url: str
     jwt_secret_key: str
     jwt_algorithm: str = "HS256"
     access_token_expire_minutes: int = 15
     cors_origins: str = "http://localhost:5173,http://127.0.0.1:5173"
+
+    @field_validator("app_name")
+    @classmethod
+    def use_current_application_name(cls, value: str) -> str:
+        if value.strip().casefold() == "balance vault":
+            return "VaultWise"
+        return value
 
     @field_validator("database_url")
     @classmethod

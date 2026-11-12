@@ -1,4 +1,4 @@
-# Balance Vault five-minute demo
+# VaultWise five-minute demo
 
 This demo is intended for a local development environment only. It must not be
 run against real money or production users.
@@ -14,8 +14,8 @@ uvicorn app.main:app --reload
 For the containerized API, run `docker compose up -d api` after applying the
 migrations and verify `docker compose ps` reports the API as healthy.
 
-The image runs as a non-root user and expects the database schema to have been
-migrated before startup.
+The image runs as a non-root user and applies Alembic migrations before the
+API server starts.
 
 ## 2. Register and log in
 

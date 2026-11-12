@@ -1,4 +1,4 @@
-# Balance Vault API
+# VaultWise API
 
 All protected endpoints use:
 

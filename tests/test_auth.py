@@ -83,9 +83,30 @@ def test_production_settings_reject_development_jwt_secret() -> None:
         raise AssertionError("Production settings accepted the development JWT secret")
 
 
+def test_default_application_name_is_vaultwise() -> None:
+    settings = Settings(
+        _env_file=None,
+        database_url="sqlite://",
+        jwt_secret_key="test-only-signing-key-not-for-deployment-use",
+    )
+
+    assert settings.app_name == "VaultWise"
+
+
+def test_legacy_application_name_is_normalized() -> None:
+    settings = Settings(
+        _env_file=None,
+        app_name="Balance Vault",
+        database_url="sqlite://",
+        jwt_secret_key="test-only-signing-key-not-for-deployment-use",
+    )
+
+    assert settings.app_name == "VaultWise"
+
+
 def test_postgres_connection_string_uses_installed_psycopg_driver() -> None:
     settings = Settings(
-        database_url="postgresql://user:password@db.example.com:5432/balance_vault",
+        database_url="postgresql://user:password@db.example.com:5432/vaultwise",
         jwt_secret_key="test-only-signing-key-not-for-deployment-use",
     )
 

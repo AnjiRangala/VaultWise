@@ -51,7 +51,7 @@ async function request<T>(
   try {
     response = await fetch(`${API_URL}${path}`, { ...options, headers });
   } catch {
-    throw new Error(`Cannot reach Balance Vault API at ${API_URL}. Start Uvicorn on port 8000.`);
+    throw new Error(`Cannot reach VaultWise API at ${API_URL}. Check the API service status.`);
   }
   if (!response.ok) {
     const body = await response.json().catch(() => null) as { detail?: string } | null;

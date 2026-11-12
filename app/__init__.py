@@ -1,1 +1,1 @@
-"""Balance Vault application package."""
+"""VaultWise application package."""

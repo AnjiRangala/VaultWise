@@ -1,4 +1,4 @@
-name: Balance Vault CI
+name: VaultWise CI
 
 on:
   push:
@@ -11,19 +11,19 @@ jobs:
       postgres:
         image: postgres:17
         env:
-          POSTGRES_DB: ledgerline
-          POSTGRES_USER: ledgerline
+          POSTGRES_DB: vaultwise
+          POSTGRES_USER: vaultwise
           POSTGRES_HOST_AUTH_METHOD: trust
         ports:
           - 5432:5432
         options: >-
-          --health-cmd "pg_isready -U ledgerline -d ledgerline"
+          --health-cmd "pg_isready -U vaultwise -d vaultwise"
           --health-interval 5s
           --health-timeout 5s
           --health-retries 10
     env:
-      DATABASE_URL: postgresql+psycopg://ledgerline@localhost:5432/ledgerline
-      BALANCE_VAULT_TEST_DATABASE_URL: postgresql+psycopg://ledgerline@localhost:5432/ledgerline
+      DATABASE_URL: postgresql+psycopg://vaultwise@localhost:5432/vaultwise
+      VAULTWISE_TEST_DATABASE_URL: postgresql+psycopg://vaultwise@localhost:5432/vaultwise
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -44,4 +44,4 @@ jobs:
       - name: Run tests
         run: pytest -q
       - name: Validate container build
-        run: docker build --tag balance-vault:ci .
+        run: docker build --tag vaultwise:ci .

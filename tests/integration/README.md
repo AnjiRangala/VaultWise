@@ -11,13 +11,13 @@ Start the development database and apply migrations:
 
 ```powershell
 docker compose up -d db
-$env:BALANCE_VAULT_TEST_DATABASE_URL = $env:DATABASE_URL
+$env:VAULTWISE_TEST_DATABASE_URL = $env:DATABASE_URL
 alembic upgrade head
 pytest tests/integration -q
 ```
 
 The tests skip with an explicit reason when
-`BALANCE_VAULT_TEST_DATABASE_URL` is unset or unreachable. This keeps the normal
+`VAULTWISE_TEST_DATABASE_URL` is unset or unreachable. This keeps the normal
 unit suite usable without silently pretending that PostgreSQL behavior was
 verified.
 

@@ -1,4 +1,4 @@
-# Balance Vault Threat Model
+# VaultWise Threat Model
 
 This document records the initial threat model. A mitigation is only marked
 verified when an executable test or a PostgreSQL runtime check provides
